@@ -2,8 +2,9 @@ package com.kriscfoster.school.teacher;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.kriscfoster.school.subject.Subject;
+import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnTransformer;
 
-import javax.persistence.*;
 import java.util.Set;
 
 @Entity
@@ -17,6 +18,13 @@ public class Teacher {
     @OneToMany(mappedBy = "teacher")
     private Set<Subject> subjects;
 
+    private static final String symkey = "secret-key-12345";
+
+    @Column(name = "name", columnDefinition = "bytea")
+    @ColumnTransformer(
+            read = "PGP_SYM_DECRYPT(name,'"+symkey+"')",
+            write = "PGP_SYM_ENCRYPT (?, '"+symkey+"')"
+    )
     private String name;
 
     public Long getId() {
